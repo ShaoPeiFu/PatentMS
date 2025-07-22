@@ -1,0 +1,67 @@
+{% extends "PatentMS/base_model.html" %} 
+{% load static %}
+{% block title_block%} 
+  首页 
+{% endblock %}
+{% block body_block %}
+<div class="jumbotron p-4">
+  <div class="container">
+    <h1 class="jumbotron-heading">很高兴为您服务！</h1>
+    <div>
+      <h2 class="h2">
+        {% if user.is_authenticated %} 很高兴看到您，欢迎{{ user.username }} 
+        {%else %} 请先登录 {% endif %}
+      </h2>
+      <strong>{{ boldmessage }}</strong>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mb-6">
+        <div class="card-body">
+          <h2>最受欢迎的分类</h2>
+          <div class="card-text">
+            {% if categories %}
+            <ul>
+              {% for category in categories %}
+              <li>
+                <a href="{% url 'show_category' category.slug %}">
+                  {{ category.name }}
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <strong>此处无分类显示</strong>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card mb-6">
+        <div class="card-body">
+          <h2>最受欢迎的页面</h2>
+          <div class="card-text">
+            {% if pages %}
+            <ul>
+              {% for page in pages %}
+              <li>
+                <a href="{{ page.url }}">{{ page.title }}</a>
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <strong>此处没有页面显示</strong>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

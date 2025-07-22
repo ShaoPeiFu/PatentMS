@@ -1,0 +1,51 @@
+{% extends 'PatentMS/base_model.html' %} 
+{% load static %} 
+{% block title_block %} 
+   {{selected_user.username}}的档案
+{% endblock %}
+{% block body_block %}
+<div class="jumbotron p-4">
+  <div class="container">
+    <h1 class="jumbotron-heading">{{selected_user.username}}的档案</h1>
+  </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <img src={{ MEDIA_URL }}{{ user_profile.picture }}
+        width="300"
+        height="300"
+        alt="{{selected_user.username}}的档案照片" />
+        <br />
+        <div>
+            {% if selected_user == user %}
+            <form method ="post" action="{% url 'profile' user.username %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{form.as_p}}
+
+                <input type="submit" value="更新">
+            </form>
+            {% else %}
+            <p>
+                <strong>邮箱</strong>
+                <a href="{{ user_profile.website }}">{{ user_profile.website }}</a>
+            </p>
+            {% endif %}
+        </div>
+        <div>
+            <button class="btn-primary"
+            onclick="alert('你通过js点击了按钮')">
+            点击我-js 
+            </button>     
+            <button class="btn btn-primary" id ="profile-btn">
+                点击我-jQuery
+            </button>
+            <p>测试用</p>
+            <div id = "msg">你好，我是一个未来用的测试</div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

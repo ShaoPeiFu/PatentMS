@@ -1,0 +1,72 @@
+{% extends "PatentMS/base_model.html" %} 
+{% load static %}
+{%load static%}
+
+{% block title_block%}
+    {{ category.name}}
+{% endblock %}
+{% block body_block %}
+    {% if category %}
+    <body data-category-id="{{ category.id }}">
+        <div class="jumbotron p-4">
+  <div class="container">
+    <h1 class="jumbotron-heading">{{ category.name }}</h1>
+    <div>
+      <h2 class="h2">
+        {% if user.is_authenticated %}
+          欢迎，{{ user.username }}
+        {% else %}
+          请先登录
+        {% endif %}
+      </h2>
+    </div>
+  </div>
+</div>
+        <div id="pages-container">
+            {% if pages%}
+                <ul>
+                    <h2>页面列表</h2>
+                    {% for page in pages%}
+                         <li>
+                            <a href="{% url 'goto' %}?page_id={{page.id}}">{{page.title}}</a>
+                            - {{page.views}} view{% if page.views != 1%}s{%  endif %}
+                        </li> 
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <strong>当前页面无pages</strong>
+            {% endif %}
+        </div>
+        
+        <!-- 搜索功能区域 -->
+        {% if user.is_authenticated %}
+        <div class="mt-4">
+            <h3>搜索并添加页面</h3>
+            <div class="input-group mb-3">
+                <input type="text" id="search-query" class="form-control" placeholder="输入搜索关键词...">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="search-btn">搜索</button>
+                </div>
+            </div>
+            <div id="search-results"></div>
+        </div>
+        {% endif %}
+        <a href="{% url "index" %}">返回主页</a>
+    {% else %}
+            特定分类不存在
+    {% endif %}
+    <div>
+        <strong id = "like_count">{{ category.likes}}</strong>点赞
+            {% if user.is_authenticated %}
+            <button id = "like_btn"
+                data-categoryid="{{ category.id }}"
+                class = "btn btn-primary btn-sm"
+                type = "button">
+                <span data-feather="thumbs-up"></span>
+                点赞分类
+            </button>
+            {% endif %}
+    </div>
+
+{% endblock %} 
+

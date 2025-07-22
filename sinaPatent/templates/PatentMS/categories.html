@@ -1,0 +1,23 @@
+
+<ul class="nav flex-column">
+    {%if categories%}
+        {%for c in categories%}
+            {% if c == current_category %}
+            <li class="nav-item">
+            <strong>
+                <a class="nav-link active" href='{% url 'show_category' c.slug %}'><span data-feature="archive"></span>{{c.name}}</a>
+            </strong>
+            </li>
+            {% else %}
+            <li>
+                <a class="nav-link" href='{% url 'show_category' c.slug %}'><span data-feature="archive"></span>{{c.name}}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <li class="nav-item"><strong>这里没有分类</strong></li>
+    {% endif %}
+</ul>
+
+
+

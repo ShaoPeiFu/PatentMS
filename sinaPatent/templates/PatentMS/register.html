@@ -1,0 +1,29 @@
+{% extends 'PatentMS/base_model.html'%}
+
+{% load static %}
+
+{% block title_block %}
+<hr />
+    注册
+{% endblock %}
+
+{% block body_block %}
+    <h1>新浪专利管理系统</h1>
+    {% if registered %}
+            <strong>感谢您的注册!</strong>
+        <a href="{% url 'index' %}">返回主页</a><br/>
+    {% else %}
+        <strong>在这里注册</strong><br />
+    <form id = "user_form" method="post" action = "{% url 'register' %}"
+        enctype = "multipart/form-data">
+    
+    {% csrf_token %}
+    {{ user_form.as_p }}
+    {{ profile_form.as_p }}
+    <input type="submit" name = "submit" value = "Register" />
+    </form>
+    {% endif %}
+{% endblock %}
+
+
+

@@ -1,0 +1,73 @@
+{% extends 'PatentMS/base_model.html'%} 
+{% block title_block %} 
+    注册 
+{% endblock%} 
+{% block body_block%}
+<div class="jumbotron p-4">
+    <div class="container">
+      <h1 class="jumbotron-heading">很高兴为您服务！</h1>
+      <div>
+        <h2 class="h2">
+          注册页面
+        </h2>
+        <strong>{{ boldmessage }}</strong>
+      </div>
+    </div>
+  </div>
+
+
+<div class="container">
+  <div class="row">
+    <div class="form-group">
+      <form method="post" action=".">
+        {% csrf_token %}
+        <div class="form-group">
+          <p class="required">
+            <label class="required" for="id_username"> Username:</label>
+            <input
+              class="form-control"
+              id="id_username"
+              maxlength="30"
+              name="username"
+              type="text"
+            />
+            <span class="helptext">
+              最多30个字符，只接受字符，数字和@/./+/-/_ 。
+            </span>
+          </p>
+          <p class="required">
+            <label class="required" for="id_email"> 邮箱：</label>
+            <input
+              class="form-control"
+              id="id_email"
+              name="email"
+              type="email"
+            />
+          </p>
+          <p class="required">
+            <label class="required" for="id_password1"> 密码：</label>
+            <input
+              class="form-control"
+              id="id_password1"
+              name="password1"
+              type="password"
+            />
+          </p>
+          <p class="required">
+            <label class="required" for="id_password2"> 密码确认:</label>
+            <input
+              class="form-control"
+              id="id_password2"
+              name="password2"
+              type="password"
+            />
+            <span class="helptext"> 请输入和之前一样的密码 </span>
+          </p>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

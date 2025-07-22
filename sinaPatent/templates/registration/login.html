@@ -1,0 +1,52 @@
+{% extends 'PatentMS/base_model.html'%} 
+{% block title_block %} 
+块
+{% endblock %} 
+{% block body_block%}
+{% comment %} <div class="container "> {% endcomment %}
+  {% comment %} <div class="row justify-content-center"> {% endcomment %}
+    {% comment %} <div class="col-md-4"> {% endcomment %}
+        <div class="jumbotron p-4">
+            <div class="container">
+              <h1 class="jumbotron-heading">很高兴为您服务！</h1>
+              <div>
+                <h2 class="h2">
+                  登陆页面
+                </h2>
+                <strong>{{ boldmessage }}</strong>
+              </div>
+            </div>
+          </div>
+
+      <form class="form-signin" method="post" action=".">
+        {% csrf_token %}
+        <label for="inputUsername" class="sr-only">用户名</label>
+        <input
+          type="text"
+          name="username"
+          id="id_username"
+          class="form-control"
+          placeholder="用户名"
+          required
+        />
+        <label for="inputPassword" class="sr-only">密码</label>
+        <input
+          type="password"
+          name="password"
+          id="id_password"
+          class="form-control"
+          placeholder="密码"
+          required
+        />
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit"
+          value="Submit"
+        >
+          登陆
+        </button>
+      </form>
+    </div>
+  {% comment %} </div> {% endcomment %}
+</div>
+{% endblock %}
