@@ -50,6 +50,7 @@ av==14.4.0
 azure-ai-translation-text==1.0.1
 azure-core==1.32.0
 babel==2.17.0
+backcall==0.2.0
 backoff==2.2.1
 bcrypt @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/bcrypt_1699241940700/work
 beautifulsoup4 @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_94rx5n7wo9/croot/beautifulsoup4-split_1718029832430/work
@@ -122,6 +123,7 @@ Django==4.0.5
 django-registration-redux==2.13
 dmglib @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_e8vusks82c/croot/dmglib_1719996269222/work
 docker==7.1.0
+docopt==0.6.2
 docstring-to-markdown @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/docstring-to-markdown_1699242114044/work
 docstring_parser==0.16
 docutils @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/docutils_1699238275731/work
@@ -203,7 +205,7 @@ intake @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_40n
 intervaltree @ file:///Users/ktietz/demo/mc3/conda-bld/intervaltree_1630511889664/work
 ipykernel @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_f428_5tjvx/croot/ipykernel_1705933835534/work
 ipympl==0.9.4
-ipython @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_f02dzd_ff3/croot/ipython_1718287987043/work
+ipython==8.12.3
 ipython-genutils @ file:///tmp/build/80754af9/ipython_genutils_1606773439826/work
 ipythonblocks==1.9.1
 ipywidgets @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_01t3jhj_j9/croot/ipywidgets_1710961498393/work
@@ -258,7 +260,6 @@ libmambapy @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs
 librosa==0.10.2.post1
 linkify-it-py @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/linkify-it-py_1699255587400/work
 # Editable Git install with no remote (llamafactory==0.9.3.dev0)
--e /Users/fushaopei/课外学习/playground/LLaMA-Factory-main
 llvmlite @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_a1dv4fk0r3/croot/llvmlite_1706910711755/work
 lmdb @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/python-lmdb_1699242995414/work
 locket @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/locket_1699239197253/work
@@ -293,7 +294,7 @@ mypy-extensions @ file:///Users/builder/cbouss/perseverance-python-buildout/croo
 namex==0.0.8
 navigator-updater @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_15xz58jgev/croot/navigator-updater_1718030392983/work
 nbclient @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/nbclient_1701803280377/work
-nbconvert @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/nbconvert_1701803442878/work
+nbconvert==7.16.6
 nbformat @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/nbformat_1701803214283/work
 nest-asyncio @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_310vb5e2a0/croot/nest-asyncio_1708532678212/work
 networkx==3.4.2
@@ -339,6 +340,7 @@ perl==1.0.0
 pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
 pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
 pillow==10.4.0
+pipreqs==0.5.0
 pkce @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/pkce_1699241403777/work
 pkginfo @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_21aly_cba3/croot/pkginfo_1715695988648/work
 platformdirs @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/platformdirs_1701803010714/work
@@ -583,6 +585,7 @@ xlwings @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_8d
 xxhash==3.5.0
 xyzservices @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/xyzservices_1699243674756/work
 yapf @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_29ra4n2npe/croot/yapf_1708964324475/work
+yarg==0.1.9
 yarl @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_a8s46tbbn5/croot/yarl_1701105147904/work
 zict @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/zict_1699250947936/work
 zipp @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/zipp_1707348942775/work
