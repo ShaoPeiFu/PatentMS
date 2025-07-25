@@ -1,29 +1,186 @@
-{% extends 'PatentMS/base_model.html'%}
-
-{% load static %}
-
-{% block title_block %}
-<hr />
-    注册
-{% endblock %}
-
+{% extends 'PatentMS/base_model.html'%} 
+{% load static %} 
+{% block title_block%}
+ 用户注册 
+{% endblock %} 
 {% block body_block %}
-    <h1>新浪专利管理系统</h1>
-    {% if registered %}
-            <strong>感谢您的注册!</strong>
-        <a href="{% url 'index' %}">返回主页</a><br/>
-    {% else %}
-        <strong>在这里注册</strong><br />
-    <form id = "user_form" method="post" action = "{% url 'register' %}"
-        enctype = "multipart/form-data">
-    
-    {% csrf_token %}
-    {{ user_form.as_p }}
-    {{ profile_form.as_p }}
-    <input type="submit" name = "submit" value = "Register" />
-    </form>
-    {% endif %}
+<div class="jumbotron p-4">
+  <div class="container">
+    <h1 class="jumbotron-heading">用户注册</h1>
+    <p class="lead">欢迎加入新浪专利管理系统</p>
+  </div>
+</div>
+
+<div class="container">
+  {% if registered %}
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="alert alert-success text-center" role="alert">
+        <h4 class="alert-heading">
+          <i class="fas fa-check-circle"></i> 注册成功！
+        </h4>
+        <p class="mb-0">感谢您的注册，现在您可以开始使用系统了。</p>
+        <hr />
+        <a href="{% url 'index' %}" class="btn btn-primary">
+          <i class="fas fa-home"></i> 返回主页
+        </a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">创建新账户</h5>
+
+          {% if messages %} {% for message in messages %}
+          <div
+            class="alert alert-{{ message.tags }} alert-dismissible fade show"
+            role="alert"
+          >
+            {{ message }}
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+            ></button>
+          </div>
+          {% endfor %} {% endif %}
+
+          <form
+            id="user_form"
+            method="post"
+            action="{% url 'register' %}"
+            enctype="multipart/form-data"
+          >
+            {% csrf_token %}
+
+            <!-- 用户信息 -->
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="text-primary">基本信息</h6>
+                {% for field in user_form %}
+                <div class="form-group mb-3">
+                  <label for="{{ field.id_for_label }}" class="form-label">
+                    {{ field.label }} {% if field.field.required %}
+                    <span class="text-danger">*</span>
+                    {% endif %}
+                  </label>
+
+                  {{ field }} {% if field.help_text %}
+                  <div class="form-text">{{ field.help_text }}</div>
+                  {% endif %} {% if field.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in field.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              </div>
+
+              <div class="col-md-6">
+                <h6 class="text-primary">档案信息</h6>
+                {% for field in profile_form %}
+                <div class="form-group mb-3">
+                  <label for="{{ field.id_for_label }}" class="form-label">
+                    {{ field.label }} {% if field.field.required %}
+                    <span class="text-danger">*</span>
+                    {% endif %}
+                  </label>
+
+                  {{ field }} {% if field.help_text %}
+                  <div class="form-text">{{ field.help_text }}</div>
+                  {% endif %} {% if field.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in field.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <a href="{% url 'index' %}" class="btn btn-secondary me-md-2">
+                <i class="fas fa-times"></i> 取消
+              </a>
+              <button type="submit" name="submit" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> 注册
+              </button>
+            </div>
+          </form>
+
+          <hr class="my-4" />
+
+          <div class="text-center">
+            <p>已有账号？</p>
+            <a href="{% url 'login' %}" class="btn btn-outline-primary">
+              <i class="fas fa-sign-in-alt"></i> 立即登录
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  $(document).ready(function () {
+    // 表单验证
+    $("#user_form").on("submit", function (e) {
+      var username = $("#id_username").val().trim();
+      var email = $("#id_email").val().trim();
+      var password = $("#id_password").val();
+      var confirmPassword = $("#id_confirm_password").val();
+
+      if (!username) {
+        alert("请输入用户名");
+        $("#id_username").focus();
+        e.preventDefault();
+        return false;
+      }
+
+      if (username.length < 3) {
+        alert("用户名至少需要3个字符");
+        $("#id_username").focus();
+        e.preventDefault();
+        return false;
+      }
+
+      if (!email) {
+        alert("请输入邮箱地址");
+        $("#id_email").focus();
+        e.preventDefault();
+        return false;
+      }
+
+      if (!password) {
+        alert("请输入密码");
+        $("#id_password").focus();
+        e.preventDefault();
+        return false;
+      }
+
+      if (password.length < 6) {
+        alert("密码至少需要6个字符");
+        $("#id_password").focus();
+        e.preventDefault();
+        return false;
+      }
+
+      if (password !== confirmPassword) {
+        alert("两次输入的密码不一致");
+        $("#id_confirm_password").focus();
+        e.preventDefault();
+        return false;
+      }
+    });
+  });
+</script>
 {% endblock %}
-
-
-

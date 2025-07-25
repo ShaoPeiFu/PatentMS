@@ -1,152 +1,757 @@
 {% extends "PatentMS/base_model.html" %} 
-{% load static %}
+{% load static %} 
+{% block title_block%} 
+{{ category.name}} 
+- 分类详情 
+{% endblock %} 
+{% block body_block%}
+{% if category %}
+<!-- 添加CSRF Token -->
+{% csrf_token %}
 
-{% block title_block%}
-    {{ category.name}}
-{% endblock %}
-{% block body_block %}
-    {% if category %}
-    <body data-category-id="{{ category.id }}">
-        <div class="jumbotron p-4">
-  <div class="container">
-    <h1 class="jumbotron-heading">{{ category.name }}</h1>
-    <div>
-      <h2 class="h2">
-        {% if user.is_authenticated %}
-          欢迎，{{ user.username }}
-        {% else %}
-          请先登录
-        {% endif %}
-      </h2>
+<div data-category-id="{{ category.id }}">
+  <!-- 分类头部信息 -->
+  <div class="category-header mb-5" data-aos="fade-down">
+    <div class="jumbotron p-5 text-center">
+      <div class="container">
+        <h1 class="display-4 fw-bold mb-3">
+          <i class="fas fa-folder-open text-primary me-3"></i>
+          {{ category.name }}
+        </h1>
+        <div
+          class="category-stats d-flex justify-content-center align-items-center mb-4"
+        >
+          <div class="stat-item me-4">
+            <i class="fas fa-eye text-info me-2"></i>
+            <span class="fw-bold">{{ category.views }}</span> 次浏览
+          </div>
+          <div class="stat-item me-4">
+            <i class="fas fa-thumbs-up text-success me-2"></i>
+            <span class="fw-bold" id="like_count">{{ category.likes }}</span>
+            个点赞
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-file-alt text-warning me-2"></i>
+            <span class="fw-bold">{{ pages.count }}</span> 个页面
+          </div>
+        </div>
+                <!-- 调试信息 -->
+        <div class="alert alert-info mb-3">
+          <h5>🔧 调试信息</h5>
+          <p>
+            <strong>用户登录状态:</strong> 
+            {{ user.is_authenticated|yesno:"已登录 ✅,未登录 ❌" }}
+          </p>
+          <p><strong>用户名:</strong> {{ user.username|default:"未登录" }}</p>
+          <p><strong>分类ID:</strong> {{ category.id }}</p>
+          <p><strong>分类名称:</strong> {{ category.name }}</p>
+        </div>
+
+        <div
+          class="category-actions"
+          style="
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+          "
+        >
+          {% if user.is_authenticated %}
+
+          <button
+            id="like_btn"
+            data-categoryid="{{ category.id }}"
+            class="btn btn-primary btn-lg me-3"
+            onclick="likeCategoryFunction();"
+            style="
+              display: inline-block !important;
+              visibility: visible !important;
+              opacity: 1 !important;
+            "
+          >
+            <i class="fas fa-thumbs-up me-2"></i>点赞分类
+          </button>
+          <a
+            href="{% url 'add_page' category.slug %}"
+            class="btn btn-success btn-lg"
+            style="
+              display: inline-block !important;
+              visibility: visible !important;
+              opacity: 1 !important;
+            "
+          >
+            <i class="fas fa-plus me-2"></i>添加页面
+          </a>
+          {% else %}
+          <div class="alert alert-warning mb-3">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            用户未登录，显示登录提示
+          </div>
+          <a href="{% url 'auth_login' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-sign-in-alt me-2"></i>登录后操作
+          </a>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </div>
-</div>
-        <div id="pages-container">
-            {% if pages%}
-                <ul>
-                    <h2>页面列表</h2>
-                    {% for page in pages%}
-                         <li>
-                            <a href="{% url 'goto' %}?page_id={{page.id}}">{{page.title}}</a>
-                            - {{page.views}} view{% if page.views != 1%}s{%  endif %}
-                        </li> 
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <strong>当前页面无pages</strong>
-            {% endif %}
+
+  <!-- 页面列表 -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card mb-4" data-aos="fade-right">
+          <div class="card-header d-flex align-items-center">
+            <i class="fas fa-list text-primary me-2"></i>
+            <h2 class="card-title mb-0">📄 页面列表</h2>
+            <span class="badge bg-primary ms-auto"
+              >{{ pages.count }} 个页面</span
+            >
+          </div>
+          <div class="card-body">
+            <div id="pages-container">
+              {% if pages %}
+              <div class="list-group list-group-flush">
+                {% for page in pages %}
+                <div
+                  class="list-group-item page-item d-flex justify-content-between align-items-center"
+                  data-aos="fade-up"
+                  data-aos-delay="{{ forloop.counter|add:0 }}"
+                >
+                  <div class="flex-grow-1">
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-file-alt text-success me-3"></i>
+                      <div>
+                        <h6 class="mb-1">
+                          <a
+                            href="{% url 'goto' %}?page_id={{page.id}}"
+                            class="text-decoration-none fw-bold"
+                          >
+                            {{ page.title }}
+                          </a>
+                        </h6>
+                        <small class="text-muted">
+                          <i class="fas fa-external-link-alt me-1"></i>
+                          点击访问页面
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <span class="badge bg-info rounded-pill me-2">
+                      <i class="fas fa-eye me-1"></i>{{ page.views }}
+                    </span>
+                    {% if page.is_popular %}
+                    <span class="badge bg-warning rounded-pill">
+                      <i class="fas fa-fire me-1"></i>热门
+                    </span>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <div class="text-center py-5" data-aos="fade-up">
+                <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">暂无页面</h4>
+                <p class="text-muted mb-4">
+                  这个分类还没有任何页面，快来添加第一个吧！
+                </p>
+                {% if user.is_authenticated %}
+                <a
+                  href="{% url 'add_page' category.slug %}"
+                  class="btn btn-primary"
+                >
+                  <i class="fas fa-plus me-2"></i>添加第一个页面
+                </a>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
         </div>
-        
-        <!-- 搜索功能区域 -->
-        {% if user.is_authenticated %}
-        <div class="mt-4">
-            <h3>搜索并添加页面</h3>
-            <div class="input-group mb-3">
-                <input type="text" id="search-query" class="form-control" placeholder="输入搜索关键词...">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" id="search-btn">搜索</button>
+      </div>
+
+      <!-- 搜索功能侧边栏 -->
+      {% if user.is_authenticated %}
+      <div class="col-lg-4">
+        <div class="search-section" data-aos="fade-left">
+          <div class="card">
+            <div class="card-header d-flex align-items-center">
+              <i class="fas fa-search text-primary me-2"></i>
+              <h3 class="card-title mb-0">🔍 智能搜索</h3>
+            </div>
+            <div class="card-body">
+              <p class="card-text mb-4">
+                使用百度搜索为
+                <strong class="text-primary">{{ category.name }}</strong>
+                分类添加相关页面
+              </p>
+
+              <!-- 搜索输入框 -->
+              <div class="input-group mb-3">
+                <span class="input-group-text bg-primary text-white">
+                  <i class="fas fa-search"></i>
+                </span>
+                <input
+                  type="text"
+                  id="search-query"
+                  class="form-control"
+                  placeholder="输入搜索关键词，如：Python教程、Django文档..."
+                />
+                <button class="btn btn-primary" type="button" id="search-btn">
+                  <i class="fas fa-search me-1"></i>搜索
+                </button>
+              </div>
+
+              <!-- 搜索建议 -->
+              <div id="search-suggestions" class="mb-3" style="display: none">
+                <small class="text-muted mb-2 d-block">
+                  <i class="fas fa-lightbulb me-1"></i>搜索建议：
+                </small>
+                <div id="suggestions-list" class="d-flex flex-wrap gap-2"></div>
+              </div>
+
+              <!-- 加载状态 -->
+              <div
+                id="search-loading"
+                class="text-center"
+                style="display: none"
+              >
+                <div class="loading-spinner mx-auto mb-3"></div>
+                <p class="text-muted mb-0">正在搜索相关页面...</p>
+              </div>
+
+              <!-- 搜索结果 -->
+              <div id="search-results"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- 返回按钮 -->
+  <div class="text-center mt-4" data-aos="fade-up">
+    <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>返回主页
+    </a>
+  </div>
+</div>
+
+{% else %}
+<div class="text-center py-5" data-aos="fade-up">
+  <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
+  <h2 class="text-warning">分类不存在</h2>
+  <p class="text-muted">您访问的分类不存在或已被删除。</p>
+  <a href="{% url 'index' %}" class="btn btn-primary">
+    <i class="fas fa-home me-2"></i>返回主页
+  </a>
+</div>
+{% endif %}
+
+<!-- 内联jQuery代码处理交互功能 -->
+<script>
+  // 全局点赞函数 - 必须在$(document).ready()外部定义
+  function likeCategoryFunction() {
+    if (typeof $ !== "undefined") {
+      // 获取参数
+      var categoryId = $("#like_btn").attr("data-categoryid");
+      var csrfToken = $("[name=csrfmiddlewaretoken]").val();
+      var currentLikes = parseInt($("#like_count").text());
+
+      // 参数验证
+      if (!categoryId) {
+        alert("错误: 分类ID为空");
+        return;
+      }
+
+      if (!csrfToken) {
+        alert("错误: CSRF Token为空");
+        return;
+      }
+
+      // 更新按钮状态
+      $("#like_btn")
+        .prop("disabled", true)
+        .html('<i class="fas fa-spinner fa-spin me-2"></i>点赞中...')
+        .removeClass("btn-primary")
+        .addClass("btn-info");
+
+      // 发送真正的AJAX请求
+      $.ajax({
+        url: "/like_category/",
+        method: "POST",
+        data: {
+          category_id: categoryId,
+          csrfmiddlewaretoken: csrfToken,
+        },
+
+        success: function (data, textStatus, xhr) {
+          // 更新显示
+          $("#like_count").text(data);
+
+          // 更新按钮状态
+          $("#like_btn")
+            .removeClass("btn-info")
+            .addClass("btn-success")
+            .html('<i class="fas fa-check me-2"></i>已点赞')
+            .prop("disabled", true);
+        },
+        error: function (xhr, status, error) {
+          // 重置按钮状态
+          $("#like_btn")
+            .prop("disabled", false)
+            .removeClass("btn-info btn-success")
+            .addClass("btn-primary")
+            .html('<i class="fas fa-thumbs-up me-2"></i>点赞分类');
+
+          alert("点赞失败，请稍后重试");
+        },
+      });
+    } else {
+      alert("jQuery未加载，无法执行点赞");
+    }
+  }
+
+  // 页面加载完成后执行
+  $(document).ready(function () {
+    // 搜索功能初始化
+
+    // 搜索建议功能
+    $("#search-input").keyup(function () {
+      var query = $(this).val();
+      $.get("/suggest/", { suggestion: query }, function (data) {
+        $("#categories-listing").html(data);
+      });
+    });
+
+    // 真正的搜索功能
+    $("#search-btn").click(function () {
+      performSearch();
+    });
+
+    // 回车键搜索
+    $("#search-query").keypress(function (e) {
+      if (e.which == 13) {
+        // Enter key
+        performSearch();
+      }
+    });
+
+    // 搜索建议功能
+    var searchTimeout;
+    $("#search-query").on("input", function () {
+      var query = $(this).val().trim();
+
+      // 清除之前的定时器
+      clearTimeout(searchTimeout);
+
+      if (query.length >= 2) {
+        // 延迟500ms后获取建议
+        searchTimeout = setTimeout(function () {
+          getSearchSuggestions(query);
+        }, 500);
+      } else {
+        $("#search-suggestions").hide();
+      }
+    });
+
+    function performSearch() {
+      var query = $("#search-query").val().trim();
+      if (query === "") {
+        showToast(
+          "warning",
+          "请输入搜索关键词",
+          "请在搜索框中输入要搜索的内容"
+        );
+        return;
+      }
+
+      // 显示加载状态
+      $("#search-loading").show();
+      $("#search-results").empty();
+      $("#search-suggestions").hide();
+
+      var categoryId = $("[data-category-id]").data("category-id");
+
+      $.ajax({
+        url: "/api/search/",
+        method: "GET",
+        data: {
+          query: query,
+          category_id: categoryId,
+        },
+        success: function (data) {
+          $("#search-loading").hide();
+
+          if (data.success && data.results.length > 0) {
+            displaySearchResults(data.results, query);
+            showToast(
+              "success",
+              "搜索完成",
+              `找到 ${data.results.length} 个相关结果`
+            );
+          } else {
+            $("#search-results").html(
+              '<div class="alert alert-info">' +
+                '<i class="fas fa-info-circle me-2"></i> 没有找到相关结果，请尝试其他关键词' +
+                "</div>"
+            );
+            showToast("info", "搜索完成", "没有找到相关结果，请尝试其他关键词");
+          }
+        },
+        error: function (xhr, status, error) {
+          $("#search-loading").hide();
+
+          var errorMsg = "搜索失败，请稍后重试";
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMsg = xhr.responseJSON.error;
+          }
+
+          $("#search-results").html(
+            '<div class="alert alert-danger">' +
+              '<i class="fas fa-exclamation-triangle me-2"></i> ' +
+              errorMsg +
+              "</div>"
+          );
+          showToast("error", "搜索失败", errorMsg);
+        },
+      });
+    }
+
+    function getSearchSuggestions(query) {
+      $.ajax({
+        url: "/api/search_suggestions/",
+        method: "GET",
+        data: { query: query },
+        success: function (data) {
+          if (data.suggestions && data.suggestions.length > 0) {
+            var html = "";
+            data.suggestions.forEach(function (suggestion) {
+              html +=
+                '<span class="badge bg-light text-dark suggestion-item" ' +
+                'style="cursor: pointer; font-size: 0.9rem;">' +
+                suggestion +
+                "</span>";
+            });
+
+            $("#suggestions-list").html(html);
+            $("#search-suggestions").show();
+
+            // 点击建议
+            $(".suggestion-item").click(function () {
+              $("#search-query").val($(this).text());
+              $("#search-suggestions").hide();
+              performSearch();
+            });
+          } else {
+            $("#search-suggestions").hide();
+          }
+        },
+        error: function () {
+          $("#search-suggestions").hide();
+        },
+      });
+    }
+
+    function displaySearchResults(results, query) {
+      var html = '<div class="mt-3">';
+      html +=
+        '<h5 class="mb-3"><i class="fas fa-list me-2"></i>搜索结果 (' +
+        results.length +
+        "个结果)</h5>";
+      html += '<div class="list-group">';
+
+      results.forEach(function (result, index) {
+        var existsClass = result.exists ? "list-group-item-secondary" : "";
+        var existsText = result.exists
+          ? '<span class="badge bg-secondary ms-2">已存在</span>'
+          : "";
+
+        html +=
+          '<div class="list-group-item ' +
+          existsClass +
+          ' search-result-item">';
+        html +=
+          '<div class="d-flex justify-content-between align-items-start">';
+        html += '<div class="flex-grow-1">';
+        html += '<h6 class="mb-1">';
+        html +=
+          '<a href="' +
+          result.url +
+          '" target="_blank" class="text-primary fw-bold">' +
+          result.title +
+          "</a>";
+        html += existsText;
+        html += "</h6>";
+        html += '<p class="mb-1 text-muted small">' + result.abstract + "</p>";
+        html +=
+          '<small class="text-muted"><i class="fas fa-link me-1"></i>' +
+          result.url +
+          "</small>";
+        html += "</div>";
+
+        if (!result.exists) {
+          html +=
+            '<button class="btn btn-success btn-sm add-page-btn ms-3" ' +
+            'data-title="' +
+            result.title.replace(/"/g, "&quot;") +
+            '" ' +
+            'data-url="' +
+            result.url +
+            '">' +
+            '<i class="fas fa-plus me-1"></i> 添加</button>';
+        }
+
+        html += "</div>";
+        html += "</div>";
+      });
+
+      html += "</div>";
+      html += '<div class="mt-3">';
+      html += '<small class="text-muted">';
+      html +=
+        '<i class="fas fa-info-circle me-1"></i> 搜索结果来自百度搜索，点击"添加"按钮将页面添加到当前分类';
+      html += "</small>";
+      html += "</div>";
+      html += "</div>";
+
+      $("#search-results").html(html);
+    }
+
+    // 添加页面按钮事件
+    $(document).on("click", ".add-page-btn", function () {
+      var title = $(this).data("title");
+      var url = $(this).data("url");
+      var categoryId = $("[data-category-id]").data("category-id");
+
+      // 禁用按钮
+      $(this)
+        .prop("disabled", true)
+        .html('<i class="fas fa-spinner fa-spin me-1"></i> 添加中...');
+
+      $.ajax({
+        url: "/search_add_page/",
+        method: "GET",
+        data: {
+          title: title,
+          url: url,
+          category_id: categoryId,
+        },
+        success: function (data) {
+          // 更新页面列表
+          $("#pages-container").html(data);
+
+          // 显示成功消息
+          showToast("success", "添加成功", `页面 "${title}" 已成功添加到分类`);
+
+          // 重新启用按钮并标记为已添加
+          $(".add-page-btn")
+            .prop("disabled", false)
+            .html('<i class="fas fa-plus me-1"></i> 添加');
+          $(".add-page-btn[data-title='" + title.replace(/"/g, "&quot;") + "']")
+            .prop("disabled", true)
+            .html('<i class="fas fa-check me-1"></i> 已添加')
+            .removeClass("btn-success")
+            .addClass("btn-secondary");
+        },
+        error: function (xhr, status, error) {
+          // 重新启用按钮
+          $(".add-page-btn")
+            .prop("disabled", false)
+            .html('<i class="fas fa-plus me-1"></i> 添加');
+
+          var errorMsg = "添加页面失败，请重试";
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMsg = xhr.responseJSON.error;
+          }
+
+          showToast("error", "添加失败", errorMsg);
+        },
+      });
+    });
+  });
+
+  // 显示消息提示
+  function showToast(type, title, message) {
+    var icon = "";
+    var bgClass = "";
+
+    switch (type) {
+      case "success":
+        icon = "fas fa-check-circle";
+        bgClass = "bg-success";
+        break;
+      case "error":
+        icon = "fas fa-exclamation-circle";
+        bgClass = "bg-danger";
+        break;
+      case "warning":
+        icon = "fas fa-exclamation-triangle";
+        bgClass = "bg-warning";
+        break;
+      case "info":
+        icon = "fas fa-info-circle";
+        bgClass = "bg-info";
+        break;
+    }
+
+    var toastHtml = `
+            <div class="toast show" role="alert">
+                <div class="toast-header ${bgClass} text-white">
+                    <i class="${icon} me-2"></i>
+                    <strong class="me-auto">${title}</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
                 </div>
             </div>
-            <div id="search-results"></div>
-        </div>
-        {% endif %}
-        <a href="{% url "index" %}">返回主页</a>
-    {% else %}
-            特定分类不存在
-    {% endif %}
-    <div>
-        <strong id = "like_count">{{ category.likes}}</strong>点赞
-            {% if user.is_authenticated %}
-            <button id = "like_btn"
-                data-categoryid="{{ category.id }}"
-                class = "btn btn-primary btn-sm"
-                type = "button">
-                <span data-feather="thumbs-up"></span>
-                点赞分类
-            </button>
-            {% endif %}
-    </div>
+        `;
 
-    <!-- 内联jQuery代码处理点赞功能 -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script>
-    $(document).ready(function() {
-        console.log("Category页面jQuery加载成功");
-        
-        // 点赞功能
-        $("#like_btn").click(function() {
-            console.log("点赞按钮被点击");
-            var categoryIdVar = $(this).attr("data-categoryid");
-            console.log("分类ID:", categoryIdVar);
-            
-            $.get("/like_category/", { category_id: categoryIdVar }, function(data) {
-                console.log("点赞成功，返回数据:", data);
-                $("#like_count").html(data);
-                $("#like_btn").hide();
-            }).fail(function(xhr, status, error) {
-                console.error("点赞失败:", error);
-                alert("点赞失败: " + error);
-            });
-        });
-        
-        // 搜索建议功能
-        $("#search-input").keyup(function() {
-            var query = $(this).val();
-            $.get("/suggest/", { suggestion: query }, function(data) {
-                $("#categories-listing").html(data);
-            });
-        });
-        
-        // 搜索和添加页面功能
-        $("#search-btn").click(function() {
-            var query = $("#search-query").val();
-            if (query.trim() === "") {
-                alert("请输入搜索关键词");
-                return;
-            }
-            
-            var mockResults = [
-                { title: query + " 教程", url: "https://example.com/tutorial" },
-                { title: query + " 文档", url: "https://example.com/docs" },
-                { title: query + " 指南", url: "https://example.com/guide" },
-            ];
-            
-            displaySearchResults(mockResults);
-        });
-        
-        function displaySearchResults(results) {
-            var html = '<div class="mt-3"><h4>搜索结果:</h4><ul class="list-group">';
-            results.forEach(function(result) {
-                html += '<li class="list-group-item d-flex justify-content-between align-items-center">';
-                html += '<div><a href="' + result.url + '" target="_blank">' + result.title + "</a></div>";
-                html += '<button class="btn btn-success btn-sm add-page-btn" ' +
-                    'data-title="' + result.title + '" ' +
-                    'data-url="' + result.url + '">添加</button>';
-                html += "</li>";
-            });
-            html += "</ul></div>";
-            $("#search-results").html(html);
-        }
-        
-        // 添加页面按钮事件
-        $(document).on("click", ".add-page-btn", function() {
-            var title = $(this).data("title");
-            var url = $(this).data("url");
-            var categoryId = $("body").data("category-id") || "1";
-            
-            $.get("/search_add_page/", {
-                title: title,
-                url: url,
-                category_id: categoryId,
-            }, function(data) {
-                $("#pages-container").html(data);
-                $("#search-results").html('<div class="alert alert-success">页面添加成功！</div>');
-            }).fail(function(xhr, status, error) {
-                alert("添加页面失败: " + error);
-            });
-        });
-    });
-    </script>
+    // 添加到toast容器
+    if (!$(".toast-container").length) {
+      $("body").append(
+        '<div class="toast-container position-fixed bottom-0 end-0 p-3"></div>'
+      );
+    }
 
-{% endblock %} 
+    $(".toast-container").append(toastHtml);
 
+    // 自动隐藏
+    setTimeout(function () {
+      $(".toast").last().fadeOut();
+    }, 5000);
+  }
+</script>
+
+<style>
+  /* 分类头部样式 */
+  .category-header {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.1),
+      rgba(139, 92, 246, 0.1)
+    );
+    border-radius: var(--border-radius);
+  }
+
+  /* 分类操作按钮样式 */
+  .category-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .category-actions .btn {
+    min-width: 140px;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+
+  .category-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .category-stats .stat-item {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+  }
+
+  .category-stats .stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 页面项目样式 */
+  .page-item {
+    transition: var(--transition);
+    border: none;
+    margin-bottom: 0.5rem;
+    border-radius: var(--border-radius) !important;
+    padding: 1rem;
+  }
+
+  .page-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.05),
+      rgba(139, 92, 246, 0.05)
+    );
+    transform: translateX(5px);
+  }
+
+  /* 搜索区域样式 */
+  .search-section {
+    position: sticky;
+    top: 2rem;
+  }
+
+  .search-result-item {
+    transition: var(--transition);
+    border: none;
+    margin-bottom: 0.5rem;
+    border-radius: var(--border-radius) !important;
+  }
+
+  .search-result-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.05),
+      rgba(139, 92, 246, 0.05)
+    );
+    transform: translateX(5px);
+  }
+
+  /* 建议样式 */
+  .suggestion-item {
+    transition: var(--transition);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+  }
+
+  .suggestion-item:hover {
+    background: var(--primary-color) !important;
+    color: white !important;
+    transform: scale(1.05);
+  }
+
+  /* 按钮加载状态 */
+  .btn-loading {
+    pointer-events: none;
+  }
+
+  /* 深色模式适配 */
+  [data-bs-theme="dark"] .category-stats .stat-item {
+    background: rgba(31, 41, 55, 0.8);
+    color: white;
+  }
+
+  [data-bs-theme="dark"] .page-item:hover,
+  [data-bs-theme="dark"] .search-result-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.1),
+      rgba(139, 92, 246, 0.1)
+    );
+  }
+
+  [data-bs-theme="dark"] .suggestion-item {
+    background: rgba(31, 41, 55, 0.8) !important;
+    color: white !important;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  [data-bs-theme="dark"] .suggestion-item:hover {
+    background: var(--primary-color) !important;
+    color: white !important;
+  }
+</style>
+
+{% endblock %}

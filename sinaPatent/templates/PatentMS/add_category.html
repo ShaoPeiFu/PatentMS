@@ -1,41 +1,360 @@
 <!DOCTYPE html>
-{% extends "PatentMS/base_model.html" %}
-
-{% load static %}
-{% block title %}
-新增分类
-{% endblock %}
-
+{% extends "PatentMS/base_model.html" %} 
+{% load static %} 
+{% block title_block%} 
+创建新分类 - 新浪专利管理系统 
+{% endblock %} 
 {% block body_block %}
-<div class="jumbotron p-4">
+<!-- 页面头部 -->
+<div class="page-header mb-5" data-aos="fade-down">
+  <div class="jumbotron p-5 text-center">
     <div class="container">
-    <h1 class="jumbotron-heading">新增分类</h1>
+      <h1 class="display-4 fw-bold mb-3">
+        <i class="fas fa-plus-circle text-primary me-3"></i>
+        创建新分类
+      </h1>
+      <p class="lead text-muted">
+        为您的专利管理系统添加新的分类，更好地组织和管理您的专利页面
+      </p>
     </div>
+  </div>
 </div>
 
+<!-- 表单区域 -->
 <div class="container">
-    <div class="row">
-        <form id="page_form" method="post"
-            action={% url 'add_category'%}>
-        {% csrf_token %}
-        {% for hidden in form.hidden_fields %}
-            {{ hidden }}
-        {% endfor %}
-        {% for field in form.visible_fields%}
-            {{ field.errors }}
-            {{ field.help_text }}</br>
-            {{ field }}</br>
-            <div class="p-2"></div>
-        {% endfor %}
-            </br>
-            <button class = "btn btn-primary" type = "submit" name="submit">
-                Add Page
-            </button>
-            <div class="p-5"></div>
-        </form>
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="card shadow-lg" data-aos="fade-up">
+        <div class="card-header bg-gradient-primary text-white">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-folder-plus me-2"></i>
+            分类信息
+          </h3>
+        </div>
+        <div class="card-body p-4">
+          <form
+            id="category_form"
+            method="post"
+            action="{% url 'add_category' %}"
+          >
+            {% csrf_token %}
+
+            <!-- 隐藏字段 -->
+            {% for hidden in form.hidden_fields %} {{ hidden }} {% endfor %}
+
+            <!-- 可见字段 -->
+            {% for field in form.visible_fields %}
+            <div class="form-group mb-4">
+              <label for="{{ field.id_for_label }}" class="form-label fw-bold">
+                <i class="fas fa-tag me-2 text-primary"></i>
+                {{ field.label }} {% if field.field.required %}
+                <span class="text-danger">*</span>
+                {% endif %}
+              </label>
+
+              <div class="input-group">
+                <span class="input-group-text bg-light">
+                  <i class="fas fa-edit text-muted"></i>
+                </span>
+                {{ field }}
+              </div>
+
+              {% if field.help_text %}
+              <div class="form-text mt-2">
+                <i class="fas fa-info-circle me-1 text-info"></i>
+                {{ field.help_text }}
+              </div>
+              {% endif %} {% if field.errors %}
+              <div class="invalid-feedback d-block mt-2">
+                {% for error in field.errors %}
+                <div
+                  class="alert alert-danger alert-dismissible fade show"
+                  role="alert"
+                >
+                  <i class="fas fa-exclamation-triangle me-2"></i>
+                  {{ error }}
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                  ></button>
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+
+            <!-- 表单操作按钮 -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+              <a
+                href="{% url 'index' %}"
+                class="btn btn-outline-secondary me-md-2"
+              >
+                <i class="fas fa-arrow-left me-2"></i>返回主页
+              </a>
+              <button
+                type="submit"
+                name="submit"
+                class="btn btn-primary btn-lg"
+              >
+                <i class="fas fa-plus me-2"></i>创建分类
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- 功能说明卡片 -->
+      <div class="card mt-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-lightbulb text-warning me-2"></i>
+            创建分类的好处
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 text-center mb-3">
+              <div class="feature-item">
+                <i class="fas fa-sitemap fa-2x text-primary mb-2"></i>
+                <h6 class="fw-bold">组织结构</h6>
+                <p class="text-muted small">更好地组织和管理您的专利页面</p>
+              </div>
+            </div>
+            <div class="col-md-4 text-center mb-3">
+              <div class="feature-item">
+                <i class="fas fa-search fa-2x text-success mb-2"></i>
+                <h6 class="fw-bold">快速查找</h6>
+                <p class="text-muted small">通过分类快速找到相关专利信息</p>
+              </div>
+            </div>
+            <div class="col-md-4 text-center mb-3">
+              <div class="feature-item">
+                <i class="fas fa-chart-line fa-2x text-warning mb-2"></i>
+                <h6 class="fw-bold">数据分析</h6>
+                <p class="text-muted small">了解每个分类的受欢迎程度</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
+
+<style>
+  /* 页面头部样式 */
+  .page-header {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.1),
+      rgba(139, 92, 246, 0.1)
+    );
+    border-radius: var(--border-radius);
+  }
+
+  .page-header .jumbotron {
+    background: transparent;
+    border: none;
+  }
+
+  /* 卡片样式 */
+  .card {
+    border: none;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+
+  .card-header.bg-gradient-primary {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    ) !important;
+  }
+
+  /* 表单样式 */
+  .form-control {
+    border-radius: 8px;
+    border: 2px solid rgba(99, 102, 241, 0.2);
+    transition: var(--transition);
+    padding: 0.75rem 1rem;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+  }
+
+  .input-group-text {
+    border: 2px solid rgba(99, 102, 241, 0.2);
+    border-right: none;
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  .input-group .form-control {
+    border-left: none;
+  }
+
+  .input-group .form-control:focus + .input-group-text,
+  .input-group .form-control:focus {
+    border-color: var(--primary-color);
+  }
+
+  /* 功能特色样式 */
+  .feature-item {
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+  }
+
+  .feature-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.05),
+      rgba(139, 92, 246, 0.05)
+    );
+    transform: translateY(-5px);
+  }
+
+  .feature-item i {
+    transition: var(--transition);
+  }
+
+  .feature-item:hover i {
+    transform: scale(1.2);
+  }
+
+  /* 按钮样式 */
+  .btn {
+    border-radius: 25px;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    transition: var(--transition);
+  }
+
+  .btn-primary {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    border: none;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-outline-secondary:hover {
+    transform: translateY(-2px);
+  }
+
+  /* 深色模式适配 */
+  [data-bs-theme="dark"] .form-control {
+    background: rgba(31, 41, 55, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  [data-bs-theme="dark"] .input-group-text {
+    background: rgba(31, 41, 55, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  [data-bs-theme="dark"] .feature-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.1),
+      rgba(139, 92, 246, 0.1)
+    );
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .page-header .jumbotron {
+      padding: 2rem 1rem !important;
+    }
+
+    .card-body {
+      padding: 1.5rem !important;
+    }
+
+    .d-md-flex {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  $(document).ready(function () {
+    // 表单验证
+    $("#category_form").on("submit", function (e) {
+      var name = $("#id_name").val().trim();
+
+      if (!name) {
+        e.preventDefault();
+        showAlert("warning", "请输入分类名称");
+        $("#id_name").focus();
+        return false;
+      }
+
+      if (name.length < 2) {
+        e.preventDefault();
+        showAlert("warning", "分类名称至少需要2个字符");
+        $("#id_name").focus();
+        return false;
+      }
+
+      // 显示提交状态
+      $('button[type="submit"]')
+        .prop("disabled", true)
+        .html('<i class="fas fa-spinner fa-spin me-2"></i>创建中...');
+    });
+
+    // 实时验证
+    $("#id_name").on("input", function () {
+      var name = $(this).val().trim();
+      var feedback = $(this).siblings(".invalid-feedback");
+
+      if (name.length > 0 && name.length < 2) {
+        $(this).addClass("is-invalid");
+        if (feedback.length === 0) {
+          $(this).after(
+            '<div class="invalid-feedback">分类名称至少需要2个字符</div>'
+          );
+        }
+      } else {
+        $(this).removeClass("is-invalid");
+        feedback.remove();
+      }
+    });
+
+    // 显示提示消息
+    function showAlert(type, message) {
+      var alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+
+      $(".card-body").prepend(alertHtml);
+
+      // 自动隐藏
+      setTimeout(function () {
+        $(".alert").fadeOut();
+      }, 5000);
+    }
+  });
+</script>
 {% endblock %}
-
-
-

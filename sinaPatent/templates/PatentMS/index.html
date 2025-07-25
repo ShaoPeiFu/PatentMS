@@ -1,67 +1,405 @@
 {% extends "PatentMS/base_model.html" %} 
-{% load static %}
+{% load static %} 
 {% block title_block%} 
-  首页 
-{% endblock %}
-{% block body_block %}
-<div class="jumbotron p-4">
-  <div class="container">
-    <h1 class="jumbotron-heading">很高兴为您服务！</h1>
-    <div>
-      <h2 class="h2">
-        {% if user.is_authenticated %} 很高兴看到您，欢迎{{ user.username }} 
-        {%else %} 请先登录 {% endif %}
-      </h2>
-      <strong>{{ boldmessage }}</strong>
-    </div>
-  </div>
-</div>
+首页 - 欢迎来到新浪专利管理系统 
+{% endblock %} 
+{% block body_block%}
 
-<div class="container">
-  <div class="row">
-    <div class="col-md-6">
-      <div class="card mb-6">
-        <div class="card-body">
-          <h2>最受欢迎的分类</h2>
-          <div class="card-text">
-            {% if categories %}
-            <ul>
-              {% for category in categories %}
-              <li>
-                <a href="{% url 'show_category' category.slug %}">
-                  {{ category.name }}
-                </a>
-              </li>
-              {% endfor %}
-            </ul>
-            {% else %}
-            <strong>此处无分类显示</strong>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="card mb-6">
-        <div class="card-body">
-          <h2>最受欢迎的页面</h2>
-          <div class="card-text">
-            {% if pages %}
-            <ul>
-              {% for page in pages %}
-              <li>
-                <a href="{{ page.url }}">{{ page.title }}</a>
-              </li>
-              {% endfor %}
-            </ul>
-            {% else %}
-            <strong>此处没有页面显示</strong>
-            {% endif %}
-          </div>
-        </div>
+<div class="hero-section text-center mb-5" data-aos="fade-up">
+  <div class="jumbotron p-5">
+    <div class="container">
+      <h1 class="display-4 fw-bold mb-4">
+        <i class="fas fa-rocket text-primary me-3"></i>
+        欢迎来到新浪专利管理系统
+      </h1>
+      <p class="lead mb-4">
+        {% if user.is_authenticated %}
+        <i class="fas fa-user-circle text-success me-2"></i>
+        很高兴看到您，欢迎
+        <span class="fw-bold text-primary">{{ user.username }}</span>
+        {% else %}
+        <i class="fas fa-sign-in-alt text-warning me-2"></i>
+        请先登录以享受完整功能 {% endif %}
+      </p>
+      <div class="hero-buttons">
+        {% if user.is_authenticated %}
+        <a href="{% url 'add_category' %}" class="btn btn-primary btn-lg me-3">
+          <i class="fas fa-plus me-2"></i>创建新分类
+        </a>
+        <a
+          href="{% url 'profile' user.username %}"
+          class="btn btn-outline-primary btn-lg"
+        >
+          <i class="fas fa-user me-2"></i>查看档案
+        </a>
+        {% else %}
+        <a href="{% url 'auth_login' %}" class="btn btn-primary btn-lg me-3">
+          <i class="fas fa-sign-in-alt me-2"></i>立即登录
+        </a>
+        <a
+          href="{% url 'registration_register' %}"
+          class="btn btn-outline-primary btn-lg"
+        >
+          <i class="fas fa-user-plus me-2"></i>免费注册
+        </a>
+        {% endif %}
       </div>
     </div>
   </div>
 </div>
+
+<!-- 统计卡片 -->
+<div class="row mb-5" data-aos="fade-up" data-aos-delay="200">
+  <div class="col-md-4 mb-3">
+    <div class="card stat-card text-center h-100">
+      <div class="card-body">
+        <div class="stat-icon mb-3">
+          <i class="fas fa-folder-open fa-3x text-primary"></i>
+        </div>
+        <h3 class="card-title fw-bold">{{ categories.count|default:0 }}</h3>
+        <p class="card-text text-muted">活跃分类</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 mb-3">
+    <div class="card stat-card text-center h-100">
+      <div class="card-body">
+        <div class="stat-icon mb-3">
+          <i class="fas fa-file-alt fa-3x text-success"></i>
+        </div>
+        <h3 class="card-title fw-bold">{{ pages.count|default:0 }}</h3>
+        <p class="card-text text-muted">专利页面</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 mb-3">
+    <div class="card stat-card text-center h-100">
+      <div class="card-body">
+        <div class="stat-icon mb-3">
+          <i class="fas fa-users fa-3x text-warning"></i>
+        </div>
+        <h3 class="card-title fw-bold">{{ visits|default:0 }}</h3>
+        <p class="card-text text-muted">访问次数</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 主要内容区域 -->
+<div class="row">
+  <!-- 最受欢迎的分类 -->
+  <div class="col-lg-6 mb-4" data-aos="fade-right">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center">
+        <i class="fas fa-fire text-warning me-2"></i>
+        <h2 class="card-title mb-0">🔥 最受欢迎的分类</h2>
+      </div>
+      <div class="card-body">
+        {% if categories %}
+        <div class="list-group list-group-flush">
+          {% for category in categories %}
+          <a
+            href="{% url 'show_category' category.slug %}"
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center category-item"
+          >
+            <div>
+              <i class="fas fa-folder text-primary me-2"></i>
+              <span class="fw-medium">{{ category.name }}</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <span class="badge bg-primary rounded-pill me-2">
+                <i class="fas fa-thumbs-up me-1"></i>{{ category.likes }}
+              </span>
+              <span class="badge bg-secondary rounded-pill">
+                <i class="fas fa-eye me-1"></i>{{ category.views }}
+              </span>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+          <p class="text-muted">暂无分类数据</p>
+          {% if user.is_authenticated %}
+          <a href="{% url 'add_category' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>创建第一个分类
+          </a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 最受欢迎的页面 -->
+  <div class="col-lg-6 mb-4" data-aos="fade-left">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center">
+        <i class="fas fa-star text-warning me-2"></i>
+        <h2 class="card-title mb-0">⭐ 最受欢迎的页面</h2>
+      </div>
+      <div class="card-body">
+        {% if pages %}
+        <div class="list-group list-group-flush">
+          {% for page in pages %}
+          <a
+            href="{% url 'goto' %}?page_id={{ page.id }}"
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center page-item"
+          >
+            <div class="flex-grow-1">
+              <i class="fas fa-file-alt text-success me-2"></i>
+              <span class="fw-medium">{{ page.title }}</span>
+              <br />
+              <small class="text-muted">
+                <i class="fas fa-folder me-1"></i>{{ page.category.name }}
+              </small>
+            </div>
+            <span class="badge bg-success rounded-pill">
+              <i class="fas fa-eye me-1"></i>{{ page.views }}
+            </span>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+          <p class="text-muted">暂无页面数据</p>
+          {% if user.is_authenticated and categories %}
+          <a
+            href="{% url 'show_category' categories.first.slug %}"
+            class="btn btn-success"
+          >
+            <i class="fas fa-plus me-2"></i>添加第一个页面
+          </a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 功能特色区域 -->
+<div class="row mt-5" data-aos="fade-up" data-aos-delay="400">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header text-center">
+        <h2 class="card-title mb-0">
+          <i class="fas fa-magic text-primary me-2"></i>
+          系统特色功能
+        </h2>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 text-center mb-4">
+            <div class="feature-item">
+              <div class="feature-icon mb-3">
+                <i class="fas fa-search fa-2x text-primary"></i>
+              </div>
+              <h5 class="fw-bold">智能搜索</h5>
+              <p class="text-muted">使用百度搜索API，快速找到相关专利页面</p>
+            </div>
+          </div>
+          <div class="col-md-4 text-center mb-4">
+            <div class="feature-item">
+              <div class="feature-icon mb-3">
+                <i class="fas fa-users fa-2x text-success"></i>
+              </div>
+              <h5 class="fw-bold">用户管理</h5>
+              <p class="text-muted">完整的用户档案系统，个性化体验</p>
+            </div>
+          </div>
+          <div class="col-md-4 text-center mb-4">
+            <div class="feature-item">
+              <div class="feature-icon mb-3">
+                <i class="fas fa-chart-line fa-2x text-warning"></i>
+              </div>
+              <h5 class="fw-bold">数据分析</h5>
+              <p class="text-muted">实时统计访问量和点赞数，了解热门内容</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 快速操作区域 -->
+{% if user.is_authenticated %}
+<div class="row mt-5" data-aos="fade-up" data-aos-delay="600">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-bolt text-warning me-2"></i>
+          快速操作
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 col-sm-6 mb-3">
+            <a
+              href="{% url 'add_category' %}"
+              class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3"
+            >
+              <i class="fas fa-plus fa-2x mb-2"></i>
+              <span>添加分类</span>
+            </a>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <a
+              href="{% url 'profile' user.username %}"
+              class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3"
+            >
+              <i class="fas fa-user fa-2x mb-2"></i>
+              <span>个人档案</span>
+            </a>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <a
+              href="{% url 'list_profiles' %}"
+              class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3"
+            >
+              <i class="fas fa-users fa-2x mb-2"></i>
+              <span>用户列表</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+  /* 英雄区域样式 */
+  .hero-section {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.1),
+      rgba(139, 92, 246, 0.1)
+    );
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+  }
+
+  .hero-section .jumbotron {
+    background: transparent;
+    border: none;
+  }
+
+  /* 统计卡片样式 */
+  .stat-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.9),
+      rgba(255, 255, 255, 0.7)
+    );
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: var(--transition);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  .stat-icon {
+    transition: var(--transition);
+  }
+
+  .stat-card:hover .stat-icon {
+    transform: scale(1.1);
+  }
+
+  /* 分类和页面项目样式 */
+  .category-item,
+  .page-item {
+    transition: var(--transition);
+    border: none;
+    margin-bottom: 0.5rem;
+    border-radius: var(--border-radius) !important;
+  }
+
+  .category-item:hover,
+  .page-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.1),
+      rgba(139, 92, 246, 0.1)
+    );
+    transform: translateX(10px);
+  }
+
+  /* 功能特色样式 */
+  .feature-item {
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+  }
+
+  .feature-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.05),
+      rgba(139, 92, 246, 0.05)
+    );
+    transform: translateY(-5px);
+  }
+
+  .feature-icon {
+    transition: var(--transition);
+  }
+
+  .feature-item:hover .feature-icon {
+    transform: scale(1.2);
+  }
+
+  /* 快速操作按钮样式 */
+  .btn-outline-primary,
+  .btn-outline-success,
+  .btn-outline-info,
+  .btn-outline-warning {
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    min-height: 100px;
+  }
+
+  .btn-outline-primary:hover,
+  .btn-outline-success:hover,
+  .btn-outline-info:hover,
+  .btn-outline-warning:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  /* 深色模式适配 */
+  [data-bs-theme="dark"] .stat-card {
+    background: linear-gradient(
+      135deg,
+      rgba(31, 41, 55, 0.9),
+      rgba(31, 41, 55, 0.7)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  [data-bs-theme="dark"] .category-item:hover,
+  [data-bs-theme="dark"] .page-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.2),
+      rgba(139, 92, 246, 0.2)
+    );
+  }
+
+  [data-bs-theme="dark"] .feature-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.1),
+      rgba(139, 92, 246, 0.1)
+    );
+  }
+</style>
 {% endblock %}

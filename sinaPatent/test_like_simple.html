@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点赞功能测试</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .test-section {
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f8f9fa;
+        }
+
+        .test-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .test-button:hover {
+            background-color: #0056b3;
+        }
+
+        .test-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .log-area {
+            background-color: #000;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #28a745;
+        }
+
+        .error {
+            color: #dc3545;
+        }
+
+        .warning {
+            color: #ffc107;
+        }
+
+        .info {
+            color: #17a2b8;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🧪 点赞功能测试页面</h1>
+
+    <div class="test-section">
+        <h2>测试参数</h2>
+        <p><strong>分类ID:</strong> <span id="category-id">2</span></p>
+        <p><strong>当前点赞数:</strong> <span id="current-likes">5</span></p>
+        <p><strong>CSRF Token:</strong> <span id="csrf-token">测试Token</span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>测试操作</h2>
+        <button id="test-like-btn" class="test-button">
+            <i class="fas fa-thumbs-up"></i> 测试点赞
+        </button>
+        <button id="reset-test-btn" class="test-button">
+            <i class="fas fa-redo"></i> 重置测试
+        </button>
+        <button id="clear-log-btn" class="test-button">
+            <i class="fas fa-trash"></i> 清空日志
+        </button>
+    </div>
+
+    <div class="test-section">
+        <h2>测试日志</h2>
+        <div id="test-log" class="log-area"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>模拟响应</h2>
+        <p>由于无法直接连接到Django后端，这里模拟点赞响应：</p>
+        <button id="simulate-success-btn" class="test-button">模拟成功响应</button>
+        <button id="simulate-error-btn" class="test-button">模拟错误响应</button>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            console.log("点赞功能测试页面加载完成");
+
+            // 日志函数
+            function addLog(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = `[${timestamp}] ${message}`;
+                console.log(logEntry);
+
+                const logElement = $('#test-log');
+                const colorClass = type;
+                logElement.append(`<div class="${colorClass}">${logEntry}</div>`);
+                logElement.scrollTop(logElement[0].scrollHeight);
+            }
+
+            // 初始化日志
+            addLog("=== 点赞功能测试页面初始化 ===", 'info');
+            addLog("页面加载完成", 'success');
+            addLog("jQuery版本: " + $.fn.jquery, 'info');
+
+            // 测试点赞按钮
+            $('#test-like-btn').click(function () {
+                addLog("=== 开始点赞测试 ===", 'info');
+
+                const categoryId = $('#category-id').text();
+                const csrfToken = $('#csrf-token').text();
+                const currentLikes = parseInt($('#current-likes').text());
+
+                addLog(`测试参数检查:`, 'info');
+                addLog(`- 分类ID: ${categoryId}`, 'info');
+                addLog(`- CSRF Token: ${csrfToken}`, 'info');
+                addLog(`- 当前点赞数: ${currentLikes}`, 'info');
+
+                if (!categoryId) {
+                    addLog("错误: 分类ID为空", 'error');
+                    return;
+                }
+
+                if (!csrfToken) {
+                    addLog("错误: CSRF Token为空", 'error');
+                    return;
+                }
+
+                // 更新按钮状态
+                $(this).prop('disabled', true)
+                    .text('测试中...')
+                    .css('background-color', '#6c757d');
+
+                addLog("发送AJAX请求...", 'info');
+
+                // 模拟AJAX请求
+                setTimeout(function () {
+                    addLog("模拟网络延迟...", 'warning');
+
+                    // 模拟成功响应
+                    const newLikes = currentLikes + 1;
+                    addLog("=== 点赞成功 ===", 'success');
+                    addLog(`响应数据: ${newLikes}`, 'success');
+                    addLog(`数据类型: number`, 'success');
+
+                    // 更新显示
+                    $('#current-likes').text(newLikes);
+
+                    // 更新按钮状态
+                    $('#test-like-btn')
+                        .prop('disabled', true)
+                        .text('测试成功')
+                        .css('background-color', '#28a745');
+
+                    addLog(`页面显示已更新，点赞数: ${newLikes}`, 'success');
+                }, 1000);
+            });
+
+            // 重置测试按钮
+            $('#reset-test-btn').click(function () {
+                addLog("=== 重置测试 ===", 'info');
+
+                // 重置点赞数
+                $('#current-likes').text('5');
+
+                // 重置按钮状态
+                $('#test-like-btn')
+                    .prop('disabled', false)
+                    .text('测试点赞')
+                    .css('background-color', '#007bff');
+
+                addLog("测试区域已重置", 'success');
+            });
+
+            // 清空日志按钮
+            $('#clear-log-btn').click(function () {
+                $('#test-log').empty();
+                addLog("日志已清空", 'info');
+            });
+
+            // 模拟成功响应
+            $('#simulate-success-btn').click(function () {
+                addLog("=== 模拟成功响应 ===", 'info');
+
+                const currentLikes = parseInt($('#current-likes').text());
+                const newLikes = currentLikes + 1;
+
+                addLog(`模拟点赞成功，点赞数从 ${currentLikes} 增加到 ${newLikes}`, 'success');
+                $('#current-likes').text(newLikes);
+
+                addLog("响应头: Content-Type: application/json", 'info');
+                addLog("响应状态: 200 OK", 'success');
+            });
+
+            // 模拟错误响应
+            $('#simulate-error-btn').click(function () {
+                addLog("=== 模拟错误响应 ===", 'info');
+
+                addLog("错误状态: error", 'error');
+                addLog("错误信息: Network Error", 'error');
+                addLog("HTTP状态码: 500", 'error');
+                addLog("响应文本: Internal Server Error", 'error');
+
+                addLog("模拟CSRF验证失败", 'error');
+                addLog("响应JSON: {\"error\": \"CSRF verification failed\"}", 'error');
+            });
+
+            // 页面加载完成后的信息
+            addLog("测试按钮ID: test-like-btn", 'info');
+            addLog("测试日志区域ID: test-log", 'info');
+            addLog("当前分类ID: " + $('#category-id').text(), 'info');
+            addLog("当前CSRF Token: " + $('#csrf-token').text(), 'info');
+        });
+    </script>
+</body>
+
+</html>

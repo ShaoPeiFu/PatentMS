@@ -16,46 +16,60 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import include, path
-from PatentMS import views
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from registration.backends.simple.views import RegistrationView
-from django.urls import reverse
-
-
-# app_name = 'PatentMS'
-
-
-class MyRegistrationView(RegistrationView):
-    def get_success_url(self, user):
-        return reverse("register_profile")
-
+from PatentMS import views
+from PatentMS.views import (
+    AddCategoryView,
+    ProfileView,
+    ListProfileView,
+    LikeCategoryView,
+    CategorySuggestionView,
+    SearchAddPageView,
+    RealSearchView,
+    SearchSuggestionsView,
+)
 
 urlpatterns = [
+    # 管理后台
+    path("admin/", admin.site.urls),
+    # 主页
     path("", views.index, name="index"),
     path("index/", views.index, name="index"),
-    path("admin/", admin.site.urls),
+    # 分类相关
     path(
         "category/<slug:category_name_slug>/", views.show_category, name="show_category"
     ),
-    path("register/", views.register, name="register"),
     path("add_category/", views.add_category, name="add_category"),
     path("add_page/<slug:category_name_slug>/", views.add_page, name="add_page"),
+    # 用户认证
     path("login/", views.user_login, name="login"),
-    path("restricted/", views.restricted, name="restricted"),
     path("logout/", views.user_logout, name="logout"),
-    path(
-        "accounts/register", MyRegistrationView.as_view(), name="registration_register"
-    ),
-    path("accounts/", include("registration.backends.simple.urls")),
-    path("goto/", views.goto_url, name="goto"),
+    path("register/", views.register, name="register"),
+    # 用户档案
+    path("profile/<str:username>/", ProfileView.as_view(), name="profile"),
+    path("list_profiles/", ListProfileView.as_view(), name="list_profiles"),
     path("register_profile/", views.register_profile, name="register_profile"),
-    path("add_category/", views.AddCategoryView.as_view(), name="add_category"),
-    path("profile/<username>", views.ProfileView.as_view(), name="profile"),
-    path("profiles/", views.ListProfileView.as_view(), name="list_profiles"),
-    path("like_category/", views.LikeCategoryView.as_view(), name="like_category"),
-    path("jquery-test/", views.jquery_test, name="jquery_test"),
-    path("suggest/", views.CategorySuggestionView.as_view(), name="suggest"),
-    path("search_add_page/", views.SearchAddPageView.as_view(), name="search_add_page"),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # 功能页面
+    path("restricted/", views.restricted, name="restricted"),
+    path("goto/", views.goto_url, name="goto"),
+    # 交互功能
+    path("like_category/", LikeCategoryView.as_view(), name="like_category"),
+    path("suggest/", CategorySuggestionView.as_view(), name="suggest"),
+    path("search_add_page/", SearchAddPageView.as_view(), name="search_add_page"),
+    # 新的搜索功能
+    path("api/search/", RealSearchView.as_view(), name="real_search"),
+    path(
+        "api/search_suggestions/",
+        SearchSuggestionsView.as_view(),
+        name="search_suggestions",
+    ),
+    # 注册应用URLs
+    path("accounts/", include("registration.backends.default.urls")),
+]
+
+# 开发环境静态文件服务
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

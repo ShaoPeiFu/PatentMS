@@ -1,23 +1,196 @@
-
-<ul class="nav flex-column">
-    {%if categories%}
-        {%for c in categories%}
-            {% if c == current_category %}
-            <li class="nav-item">
-            <strong>
-                <a class="nav-link active" href='{% url 'show_category' c.slug %}'><span data-feature="archive"></span>{{c.name}}</a>
-            </strong>
-            </li>
-            {% else %}
-            <li>
-                <a class="nav-link" href='{% url 'show_category' c.slug %}'><span data-feature="archive"></span>{{c.name}}</a>
-            </li>
-            {% endif %}
-        {% endfor %}
+<div class="categories-container">
+  {% if categories %}
+  <div class="list-group list-group-flush">
+    {% for c in categories %} {% if c == current_category %}
+    <a
+      class="list-group-item list-group-item-action active category-item current-category"
+      href="{% if c.slug %}{% url 'show_category' c.slug %}{% else %}#{% endif %}"
+      data-aos="fade-right"
+      data-aos-delay="{{ forloop.counter|add:0 }}"
+    >
+      <div class="d-flex align-items-center">
+        <i class="fas fa-folder-open text-warning me-3"></i>
+        <div class="flex-grow-1">
+          <h6 class="mb-1 fw-bold">{{ c.name }}</h6>
+          <small class="opacity-75">
+            <i class="fas fa-eye me-1"></i>{{ c.views }} 浏览
+            <i class="fas fa-thumbs-up ms-2 me-1"></i>{{ c.likes }} 点赞
+          </small>
+        </div>
+        <span class="badge bg-warning rounded-pill">
+          <i class="fas fa-star me-1"></i>当前
+        </span>
+      </div>
+    </a>
     {% else %}
-        <li class="nav-item"><strong>这里没有分类</strong></li>
-    {% endif %}
-</ul>
+    <a
+      class="list-group-item list-group-item-action category-item"
+      href="{% if c.slug %}{% url 'show_category' c.slug %}{% else %}#{% endif %}"
+      data-aos="fade-right"
+      data-aos-delay="{{ forloop.counter|add:0 }}"
+    >
+      <div class="d-flex align-items-center">
+        <i class="fas fa-folder text-primary me-3"></i>
+        <div class="flex-grow-1">
+          <h6 class="mb-1 fw-medium">{{ c.name }}</h6>
+          <small class="text-muted">
+            <i class="fas fa-eye me-1"></i>{{ c.views }} 浏览
+            <i class="fas fa-thumbs-up ms-2 me-1"></i>{{ c.likes }} 点赞
+          </small>
+        </div>
+        <div class="category-actions">
+          {% if c.likes > 5 %}
+          <span class="badge bg-success rounded-pill me-1">
+            <i class="fas fa-fire me-1"></i>热门
+          </span>
+          {% endif %}
+          <i class="fas fa-chevron-right text-muted"></i>
+        </div>
+      </div>
+    </a>
+    {% endif %} {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-4" data-aos="fade-up">
+    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+    <h6 class="text-muted mb-2">暂无分类</h6>
+    <p class="text-muted small mb-3">还没有创建任何分类</p>
+    <a href="{% url 'add_category' %}" class="btn btn-primary btn-sm">
+      <i class="fas fa-plus me-1"></i>创建分类
+    </a>
+  </div>
+  {% endif %}
+</div>
 
+<style>
+  /* 分类列表样式 */
+  .categories-container {
+    max-height: 70vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+  }
 
+  .categories-container::-webkit-scrollbar {
+    width: 6px;
+  }
 
+  .categories-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .categories-container::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.3);
+    border-radius: 3px;
+  }
+
+  .categories-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.5);
+  }
+
+  .category-item {
+    border: none;
+    border-radius: var(--border-radius) !important;
+    margin-bottom: 0.5rem;
+    transition: var(--transition);
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+  }
+
+  .category-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.1),
+      rgba(139, 92, 246, 0.1)
+    );
+    transform: translateX(8px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .category-item.active {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    color: white;
+    transform: translateX(8px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+  }
+
+  .category-item.active .text-muted {
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
+
+  .category-item.active .fas {
+    color: white !important;
+  }
+
+  .category-actions {
+    opacity: 0;
+    transition: var(--transition);
+  }
+
+  .category-item:hover .category-actions {
+    opacity: 1;
+  }
+
+  .category-item.active .category-actions {
+    opacity: 1;
+  }
+
+  /* 深色模式适配 */
+  [data-bs-theme="dark"] .category-item {
+    background: rgba(31, 41, 55, 0.8);
+    color: white;
+  }
+
+  [data-bs-theme="dark"] .category-item:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.2),
+      rgba(139, 92, 246, 0.2)
+    );
+  }
+
+  [data-bs-theme="dark"] .category-item.active {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+  }
+
+  /* 动画效果 */
+  @keyframes slideInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .category-item {
+    animation: slideInFromLeft 0.5s ease-out;
+  }
+
+  .category-item:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .category-item:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .category-item:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .category-item:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  .category-item:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+</style>

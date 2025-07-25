@@ -1,29 +1,100 @@
 <!DOCTYPE html>
-{% extends 'PatentMS/base_model.html'%}
-{% load static %}
-{% block title_block %}
-    新建页面
-{% endblock %}
+{% extends 'PatentMS/base_model.html'%} 
+{% load static %} 
+{% block title_block%}
+ 新建页面 - {{ category.name }} 
+ {% endblock %} 
+ {% block body_block %}
+<div class="jumbotron p-4">
+  <div class="container">
+    <h1 class="jumbotron-heading">添加页面</h1>
+    <p class="lead">为分类 <strong>{{ category.name }}</strong> 添加新页面</p>
+  </div>
+</div>
 
-{% block body_block %}
-    {% if category %}
-        <h1>添加页面</h1>
-        <h2>{{ category.name }}</h2>
-        <div>
-            <form id="page_form" method="post" action="{% url 'add_page' category.slug %}">
-                {% csrf_token %}
-                {% for hidden in form.hidden_fields %}
-                    {{ hidden }}
+<div class="container">
+  {% if category %}
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <form
+            id="page_form"
+            method="post"
+            action="{% url 'add_page' category.slug %}"
+          >
+            {% csrf_token %} {% for hidden in form.hidden_fields %} {{ hidden }}
+            {% endfor %} {% for field in form.visible_fields %}
+            <div class="form-group mb-3">
+              <label for="{{ field.id_for_label }}" class="form-label">
+                {{ field.label }} {% if field.field.required %}
+                <span class="text-danger">*</span>
+                {% endif %}
+              </label>
+
+              {{ field }} {% if field.help_text %}
+              <div class="form-text">{{ field.help_text }}</div>
+              {% endif %} {% if field.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                <div class="text-danger">{{ error }}</div>
                 {% endfor %}
-                {% for field in form.visible_fields %}
-                    {{ field.errors }}
-                    {{ field.help_text }}
-                    {{ field }}
-                {% endfor %}
-            <input type="submit" name="submit" value="Add Page" />
-            </form>
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <a
+                href="{% url 'show_category' category.slug %}"
+                class="btn btn-secondary me-md-2"
+              >
+                <i class="fas fa-arrow-left"></i> 返回
+              </a>
+              <button type="submit" name="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> 添加页面
+              </button>
+            </div>
+          </form>
         </div>
-    {% else %}
-        The selected category does not exist.
-    {% endif %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-warning" role="alert">
+    <h4 class="alert-heading">分类不存在</h4>
+    <p>您选择的分类不存在或已被删除。</p>
+    <hr />
+    <a href="{% url 'index' %}" class="btn btn-primary">返回主页</a>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  $(document).ready(function () {
+    // 表单验证
+    $("#page_form").on("submit", function (e) {
+      var title = $("#id_title").val().trim();
+      var url = $("#id_url").val().trim();
+
+      if (!title) {
+        alert("请输入页面标题");
+        e.preventDefault();
+        return false;
+      }
+
+      if (!url) {
+        alert("请输入页面URL");
+        e.preventDefault();
+        return false;
+      }
+
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        alert("URL必须以http://或https://开头");
+        e.preventDefault();
+        return false;
+      }
+    });
+  });
+</script>
 {% endblock %}

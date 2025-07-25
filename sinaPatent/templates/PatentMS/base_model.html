@@ -1,137 +1,581 @@
 <!DOCTYPE html>
-
-{% load static %}
+{% load static %} 
 {% load PatentMS_template_tags %}
 
-
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewpoint"
-          content="width=device-width,initial-scale=1,shrink-to-fit=no">
-    <meta name="author"
-          content="description" content="">
-    <meat name ="generator"
-          content="Jekyll v3.8.5">
-    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+<html lang="zh-CN" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="author" content="新浪专利管理系统" />
+    <meta name="description" content="现代化的专利管理系统" />
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" />
     <title>
-        新浪 - {% block title_block %}专利管理系统{% endblock %}
+      新浪专利管理系统 - {% block title_block %} 专利管理系统 {% endblock %}
     </title>
-    <!-- Bootstrap core css-->
-    <link href="https://getbootstrap.com/docs/4.2/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <link href="https://getbootstrap.com/docs/4.2/examples/dashboard/dashboard.css"
-          rel="stylesheet">
-</head>
 
-<body>
-<header>
-    <nav class = "navbar navbar-expand-md navbar-dark fixed-top bg-dark p-0">
-    <a class="navbar-brand p-2" href="{% url 'index' %}">新浪专利管理系统</a>
-    <button class="navbar-toggler" type="button" data-toggle = "collapse"
-        data-target="#navbarCollapse" aria-controls="navbarCollapse"
-        aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggle-icon"></span>
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome 6 -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet" />
+    <style>
+      :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --dark-color: #1f2937;
+        --light-color: #f8fafc;
+        --border-radius: 12px;
+        --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      /* 导航栏样式 */
+      .navbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: var(--transition);
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .nav-link {
+        font-weight: 500;
+        position: relative;
+        transition: var(--transition);
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        transition: var(--transition);
+        transform: translateX(-50%);
+      }
+
+      .nav-link:hover::after {
+        width: 100%;
+      }
+
+      /* 主要内容区域 */
+      .main-content {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin: 2rem auto;
+        padding: 2rem;
+        min-height: calc(100vh - 200px);
+      }
+
+      /* 侧边栏样式 */
+      .sidebar {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+        height: fit-content;
+        position: sticky;
+        top: 2rem;
+      }
+
+      .sidebar .form-control {
+        border-radius: 25px;
+        border: 2px solid rgba(99, 102, 241, 0.2);
+        transition: var(--transition);
+      }
+
+      .sidebar .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+      }
+
+      /* 卡片样式 */
+      .card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        overflow: hidden;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      .card-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border: none;
+        font-weight: 600;
+      }
+
+      /* 按钮样式 */
+      .btn {
+        border-radius: 25px;
+        font-weight: 500;
+        padding: 0.5rem 1.5rem;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: var(--transition);
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        border: none;
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+        border: none;
+      }
+
+      /* Jumbotron样式 */
+      .jumbotron {
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.1),
+          rgba(139, 92, 246, 0.1)
+        );
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        backdrop-filter: blur(10px);
+      }
+
+      /* 列表样式 */
+      .list-group-item {
+        border: none;
+        border-radius: var(--border-radius) !important;
+        margin-bottom: 0.5rem;
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.8);
+      }
+
+      .list-group-item:hover {
+        background: rgba(99, 102, 241, 0.1);
+        transform: translateX(5px);
+      }
+
+      /* 搜索区域样式 */
+      .search-section {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.9),
+          rgba(255, 255, 255, 0.7)
+        );
+        backdrop-filter: blur(10px);
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 2rem;
+        margin-top: 2rem;
+      }
+
+      /* 加载动画 */
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(99, 102, 241, 0.3);
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* 深色模式 */
+      [data-bs-theme="dark"] {
+        --dark-color: #f8fafc;
+        --light-color: #1f2937;
+      }
+
+      [data-bs-theme="dark"] .navbar {
+        background: rgba(31, 41, 55, 0.95) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      [data-bs-theme="dark"] .main-content {
+        background: rgba(31, 41, 55, 0.95);
+        color: white;
+      }
+
+      [data-bs-theme="dark"] .sidebar {
+        background: rgba(31, 41, 55, 0.9);
+        color: white;
+      }
+
+      [data-bs-theme="dark"] .card {
+        background: rgba(31, 41, 55, 0.8);
+        color: white;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 768px) {
+        .main-content {
+          margin: 1rem;
+          padding: 1rem;
+        }
+
+        .sidebar {
+          position: static;
+          margin-bottom: 1rem;
+        }
+      }
+
+      /* 浮动操作按钮 */
+      .fab {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        transition: var(--transition);
+        z-index: 1000;
+      }
+
+      .fab:hover {
+        transform: scale(1.1);
+        color: white;
+      }
+
+      /* 通知样式 */
+      .toast {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--box-shadow);
+      }
+
+      /* 进度条样式 */
+      .progress {
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(99, 102, 241, 0.1);
+      }
+
+      .progress-bar {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">
+          <i class="fas fa-rocket me-2"></i>新浪专利管理系统
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarCollapse"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'index' %}">
+                <i class="fas fa-home me-1"></i>主页
+              </a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'restricted' %}">
+                <i class="fas fa-shield-alt me-1"></i>限制
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'add_category' %}">
+                <i class="fas fa-plus me-1"></i>添加分类
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'profile' user.username %}">
+                <i class="fas fa-user me-1"></i>我的档案
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'list_profiles' %}">
+                <i class="fas fa-users me-1"></i>用户档案
+              </a>
+            </li>
+
+            {% endif %}
+          </ul>
+
+          <ul class="navbar-nav">
+            {% if user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-user-circle me-1"></i>{{ user.username }}
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'auth_password_change' %}"
+                  >
+                    <i class="fas fa-key me-2"></i>更改密码
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'auth_logout' %}">
+                    <i class="fas fa-sign-out-alt me-2"></i>登出
+                  </a>
+                </li>
+              </ul>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'registration_register' %}">
+                <i class="fas fa-user-plus me-1"></i>注册
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'auth_login' %}">
+                <i class="fas fa-sign-in-alt me-1"></i>登录
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="container-fluid" style="margin-top: 80px">
+      <div class="row">
+        <!-- 侧边栏 -->
+        <div class="col-lg-3 col-md-4">
+          <div class="sidebar">
+            <div class="mb-3">
+              <input
+                type="search"
+                id="search-input"
+                class="form-control"
+                placeholder="搜索分类..."
+              />
+            </div>
+
+            <div id="categories-listing">
+              {% block sidebar_block %} {% get_category_list category %}
+              {%endblock %}
+            </div>
+          </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="col-lg-9 col-md-8">
+          <div class="main-content">{% block body_block %} {% endblock %}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 浮动操作按钮 -->
+    <button class="fab" id="theme-toggle" title="切换主题">
+      <i class="fas fa-moon"></i>
     </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-    <ul class="navbar-nav mr-auto">
-    <li class="nav-item">
-        <a class="nav-link" href="{% url 'index' %}">主页</a></li>
-    <li class = nav-item>
-    {% if user.is_authenticated %}
-    <li class='nav-item'>
-        <a class='nav-link'
-            href="{% url 'restricted' %}">限制</a></li>
-    <li class='nav-item'>
-        <form method="post" action="{% url 'auth_logout' %}" style="display: inline;">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{% url 'index' %}">
-            <button type="submit" class="nav-link btn btn-link" style="border: none; background: none; padding: 0.5rem 1rem;">登出</button>
-        </form>
-    </li>
-    <li class='nav-item'>
-        <a class='nav-link'
-            href="{% url 'add_category' %}">添加分类</a></li>
-    <li class='nav-item'>
-        <a class='nav-link'
-            href="{% url 'auth_password_change'%}">更改密码</a></li>
-    <li class='nav-item'>
-        <a class='nav-link'
-            href="{% url 'profile' user.username %}">我的档案</a></li> 
-    <li class='nav-item'>
-        <a class='nav-link'
-            href="{% url 'list_profiles' %}">用户档案集</a></li>
-    <li class='nav-item'>
-        <a class='nav-link'
-            href="{% url 'jquery_test' %}">jQuery测试</a></li>
-    {% else %}
-    <li class='nav-item'>
-        <a class='nav-link'
-            href="{% url 'registration_register' %}">请在此处注册</a></li>
-    <li class='nav-item'>
-        <a class='nav-link'
-            href="{% url 'auth_login' %}">登陆</a></li>
-    
-    
+
+    <!-- 消息提示 -->
+    {% if messages %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      {% for message in messages %}
+      <div class="toast show" role="alert">
+        <div class="toast-header">
+          <i class="fas fa-info-circle me-2 text-primary"></i>
+          <strong class="me-auto">系统消息</strong>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+        <div class="toast-body">{{ message }}</div>
+      </div>
+      {% endfor %}
+    </div>
     {% endif %}
-    </ul>
-    </div>
-    </nav>
-</header>
 
-    
-<div class="container-fluid">
-    <div class="row">
-    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-    <div class="sidebar-sticky">
-    <div class = "w-75 ml-3">
-        <input type = "search"
-        id = "search-input"
-        class="form-control ds-input"
-        placeholder="search..."/>
-    </div>
+    <!-- JavaScript库 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{% static 'js/PatentMS-jquery.js' %}?v=2.0"></script>
+    <script src="{% static 'js/enhanced.js' %}?v=2.0"></script>
 
-    <div class = "sidebar-sticky" id = "categories-listing">
-    {% block sidebar_block %}
-        {% get_category_list category %}
-    {% endblock %}
-    </div>
-    </nav>
-    <main role="main" class = "col-md-9 ml-sm-auto col-lg-10 px-4">
-    {% block body_block %}
-    {% endblock %}
-    </main>
-    </div>
-    </div>
-    
-    </div>
-    </div>
-    
-    <!-- 页面最底部版权信息 -->
-    <div style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: #f8f9fa; padding: 10px 0; text-align: center; border-top: 1px solid #dee2e6;">
-        <p style="margin: 0;">&copy; 2020 Tango With Django 2 &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
-    </div>
-    <script src="{% static 'js/jquery-3.7.1.min.js' %}" crossorigin="anonymous"></script>
-    <script src="{% static 'js/PatentMS-jquery.js' %}"></script>
-    <script src="https://getbootstrap.com/docs/4.2/dist/js/bootstrap.bundle.min.js">
-        </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js">
-    </>
-    <script src="https://getbootstrap.com/docs/4.2/examples/dashboard/dashboard.js">
-    </script>
     <script>
-        // 初始化 Feather Icons
-        feather.replace();
+      // 初始化AOS动画
+      AOS.init({
+        duration: 800,
+        easing: "ease-in-out",
+        once: true,
+      });
+
+      // 主题切换功能
+      document
+        .getElementById("theme-toggle")
+        .addEventListener("click", function () {
+          const html = document.documentElement;
+          const icon = this.querySelector("i");
+
+          if (html.getAttribute("data-bs-theme") === "dark") {
+            html.setAttribute("data-bs-theme", "light");
+            icon.className = "fas fa-moon";
+            this.title = "切换到深色模式";
+          } else {
+            html.setAttribute("data-bs-theme", "dark");
+            icon.className = "fas fa-sun";
+            this.title = "切换到浅色模式";
+          }
+        });
+
+      // 导航栏滚动效果
+      window.addEventListener("scroll", function () {
+        const navbar = document.querySelector(".navbar");
+        if (window.scrollY > 50) {
+          navbar.style.background = "rgba(255, 255, 255, 0.98)";
+        } else {
+          navbar.style.background = "rgba(255, 255, 255, 0.95)";
+        }
+      });
+
+      // 自动隐藏消息提示
+      setTimeout(function () {
+        const toasts = document.querySelectorAll(".toast");
+        toasts.forEach((toast) => {
+          const bsToast = new bootstrap.Toast(toast);
+          bsToast.hide();
+        });
+      }, 5000);
     </script>
-    </body>
-
+  </body>
 </html>
-
-
-
-
-
-
-
-
-

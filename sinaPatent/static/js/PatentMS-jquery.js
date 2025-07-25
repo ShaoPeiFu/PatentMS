@@ -1,163 +1,31 @@
-// jQuery功能演示和测试文件
+// jQuery功能文件
 
 $(document).ready(function () {
   console.log("PatentMS jQuery文件加载成功！");
   console.log("jQuery版本:", $.fn.jquery);
 
-  // 1. 检查jQuery是否加载
+  // 检查jQuery是否加载
   if (typeof jQuery !== "undefined") {
     console.log("✅ jQuery已成功加载");
   } else {
     console.log("❌ jQuery加载失败");
   }
 
-  // 2. 鼠标悬停效果 - 为所有p标签添加红色效果
-  $("p").hover(
-    function () {
-      $(this).css("color", "red");
-    },
-    function () {
-      $(this).css("color", "");
-    }
-  );
-
-  // 3. 点击效果 - 点击元素时改变背景色
-  $(".clickable").click(function () {
-    $(this).css("background-color", "yellow");
-    setTimeout(() => {
-      $(this).css("background-color", "");
-    }, 1000);
-  });
-
-  // 4. 淡入淡出效果
-  $(".fade-effect").hover(function () {
-    $(this).fadeOut(200).fadeIn(200);
-  });
-
-  // 5. 滑动效果
-  $(".slide-effect").click(function () {
-    $(this).slideUp(300).slideDown(300);
-  });
-
-  // 6. 添加/删除CSS类
-  $(".toggle-class").click(function () {
-    $(this).toggleClass("highlight");
-  });
-
-  // 7. 修改文本内容
-  $(".change-text").click(function () {
-    var originalText = $(this).text();
-    $(this).text("文本已更改！");
-    setTimeout(() => {
-      $(this).text(originalText);
-    }, 2000);
-  });
-
-  // 8. 表单验证
-  $('input[type="text"]').blur(function () {
-    if ($(this).val().length < 3) {
-      $(this).css("border-color", "red");
-    } else {
-      $(this).css("border-color", "green");
-    }
-  });
-
-  // 9. AJAX示例（如果需要的话）
-  $(".ajax-test").click(function () {
-    $.ajax({
-      url: "/api/test/",
-      method: "GET",
-      success: function (data) {
-        console.log("AJAX请求成功:", data);
-      },
-      error: function (xhr, status, error) {
-        console.log("AJAX请求失败:", error);
-      },
-    });
-  });
-
-  // 10. 动画效果
-  $(".animate-effect").hover(
-    function () {
-      $(this).animate(
-        {
-          fontSize: "+=2px",
-          opacity: 0.8,
-        },
-        200
-      );
-    },
-    function () {
-      $(this).animate(
-        {
-          fontSize: "-=2px",
-          opacity: 1,
-        },
-        200
-      );
-    }
-  );
-
-  // 11. 键盘事件
-  $(document).keydown(function (e) {
-    if (e.ctrlKey && e.keyCode === 65) {
-      // Ctrl+A
-      console.log("全选快捷键被按下");
-    }
-  });
-
-  // 12. 窗口大小改变事件
-  $(window).resize(function () {
-    console.log("窗口大小改变:", $(window).width(), "x", $(window).height());
-  });
-
-  // 13. 滚动事件
-  $(window).scroll(function () {
-    var scrollTop = $(window).scrollTop();
-    if (scrollTop > 100) {
-      $(".scroll-indicator").fadeIn();
-    } else {
-      $(".scroll-indicator").fadeOut();
-    }
-  });
-
-  // 14. 动态添加元素
-  $(".add-element").click(function () {
-    var newElement = $('<div class="dynamic-element">动态添加的元素</div>');
-    $(this).after(newElement);
-  });
-
-  // 15. 删除元素
-  $(".remove-element").click(function () {
-    $(this).remove();
-  });
-
-  console.log("所有jQuery功能已初始化完成！");
+  console.log("jQuery功能已初始化完成！");
 });
 
-// 全局jQuery函数
-function testJQuery() {
-  alert("jQuery工作正常！版本: " + $.fn.jquery);
-}
-
-// 工具函数
-function highlightElement(selector) {
-  $(selector).css("background-color", "yellow");
-  setTimeout(() => {
-    $(selector).css("background-color", "");
-  }, 2000);
-}
-
 $(document).ready(function () {
-  $("#like_btn").click(function () {
-    var categoryIdVar;
-    categoryIdVar = $(this).attr("data-categoryid");
+  // 移除重复的点赞按钮事件绑定，避免与category.html中的事件冲突
+  // $("#like_btn").click(function () {
+  //   var categoryIdVar;
+  //   categoryIdVar = $(this).attr("data-categoryid");
 
-    $.get("/like_category/", { category_id: categoryIdVar }, function (data) {
-      $("#like_count").html(data);
-      $("#like_btn").hide();
-    });
-  });
+  //   $.get("/like_category/", { category_id: categoryIdVar }, function (data) {
+  //     $("#like_count").html(data);
+  //     $("#like_btn").hide();
+  //   });
+  // });
+
   $("#search-input").keyup(function () {
     var query;
     query = $(this).val();
@@ -167,7 +35,7 @@ $(document).ready(function () {
     });
   });
 
-  // 搜索功能
+  // 搜索功能 - 调用真实的搜索API
   $("#search-btn").click(function () {
     var query = $("#search-query").val();
     if (query.trim() === "") {
@@ -175,39 +43,112 @@ $(document).ready(function () {
       return;
     }
 
-    // 模拟搜索结果（此处在日后应该调用真实的搜索API）
-    var mockResults = [
-      { title: query + " 教程", url: "https://example.com/tutorial" },
-      { title: query + " 文档", url: "https://example.com/docs" },
-      { title: query + " 指南", url: "https://example.com/guide" },
-    ];
+    // 显示加载状态
+    $("#search-loading").show();
+    $("#search-results").empty();
 
-    displaySearchResults(mockResults);
+    // 获取分类ID
+    var categoryId = $("[data-category-id]").data("category-id");
+
+    // 调用真实的搜索API
+    $.ajax({
+      url: "/api/search/",
+      method: "GET",
+      data: {
+        query: query,
+        category_id: categoryId,
+      },
+      success: function (data) {
+        $("#search-loading").hide();
+
+        if (data.success && data.results.length > 0) {
+          displaySearchResults(data.results);
+        } else {
+          $("#search-results").html(
+            '<div class="alert alert-info">' +
+              '<i class="fas fa-info-circle me-2"></i> 没有找到相关结果，请尝试其他关键词' +
+              "</div>"
+          );
+        }
+      },
+      error: function (xhr, status, error) {
+        $("#search-loading").hide();
+        console.error("搜索失败:", error);
+
+        var errorMsg = "搜索失败，请稍后重试";
+        if (xhr.responseJSON && xhr.responseJSON.error) {
+          errorMsg = xhr.responseJSON.error;
+        }
+
+        $("#search-results").html(
+          '<div class="alert alert-danger">' +
+            '<i class="fas fa-exclamation-triangle me-2"></i> ' +
+            errorMsg +
+            "</div>"
+        );
+      },
+    });
   });
 
   // 显示搜索结果
   function displaySearchResults(results) {
-    var html = '<div class="mt-3"><h4>搜索结果:</h4><ul class="list-group">';
-    results.forEach(function (result) {
+    var html = '<div class="mt-3">';
+    html +=
+      '<h5 class="mb-3"><i class="fas fa-list me-2"></i>搜索结果 (' +
+      results.length +
+      "个结果)</h5>";
+    html += '<div class="list-group">';
+
+    results.forEach(function (result, index) {
+      var existsClass = result.exists ? "list-group-item-secondary" : "";
+      var existsText = result.exists
+        ? '<span class="badge bg-secondary ms-2">已存在</span>'
+        : "";
+
       html +=
-        '<li class="list-group-item d-flex justify-content-between align-items-center">';
+        '<div class="list-group-item ' + existsClass + ' search-result-item">';
+      html += '<div class="d-flex justify-content-between align-items-start">';
+      html += '<div class="flex-grow-1">';
+      html += '<h6 class="mb-1">';
       html +=
-        '<div><a href="' +
+        '<a href="' +
         result.url +
-        '" target="_blank">' +
+        '" target="_blank" class="text-primary fw-bold">' +
         result.title +
-        "</a></div>";
+        "</a>";
+      html += existsText;
+      html += "</h6>";
+      html += '<p class="mb-1 text-muted small">' + result.abstract + "</p>";
       html +=
-        '<button class="btn btn-success btn-sm add-page-btn" ' +
-        'data-title="' +
-        result.title +
-        '" ' +
-        'data-url="' +
+        '<small class="text-muted"><i class="fas fa-link me-1"></i>' +
         result.url +
-        '">添加</button>';
-      html += "</li>";
+        "</small>";
+      html += "</div>";
+
+      if (!result.exists) {
+        html +=
+          '<button class="btn btn-success btn-sm add-page-btn ms-3" ' +
+          'data-title="' +
+          result.title.replace(/"/g, "&quot;") +
+          '" ' +
+          'data-url="' +
+          result.url +
+          '">' +
+          '<i class="fas fa-plus me-1"></i> 添加</button>';
+      }
+
+      html += "</div>";
+      html += "</div>";
     });
-    html += "</ul></div>";
+
+    html += "</div>";
+    html += '<div class="mt-3">';
+    html += '<small class="text-muted">';
+    html +=
+      '<i class="fas fa-info-circle me-1"></i> 搜索结果来自真实搜索，点击"添加"按钮将页面添加到当前分类';
+    html += "</small>";
+    html += "</div>";
+    html += "</div>";
 
     $("#search-results").html(html);
   }
