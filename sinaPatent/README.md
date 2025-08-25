@@ -208,19 +208,7 @@ coverage html
 
 - **开发团队** - 新浪专利管理系统开发组
 
-## 🙏 致谢
 
-- Django 框架
-- Bootstrap UI 框架
-- jQuery 库
-- 所有贡献者
-
-## 📞 联系方式
-
-如有问题或建议，请通过以下方式联系：
-
-- 邮箱：support@example.com
-- 项目 Issues：[GitHub Issues](https://github.com/your-repo/issues)
 
 ---
 
